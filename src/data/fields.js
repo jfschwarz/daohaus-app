@@ -307,6 +307,13 @@ export const FIELD = {
     info: INFO_TEXT.RAGE_QUIT_INPUT,
     expectType: 'integer',
   },
+  RARIBLE_NFT_INPUT: {
+    type: 'raribleNftInput',
+    label: 'NFT From Rarible',
+    name: 'nftListing',
+    htmlFor: 'nftListing',
+    placeholder: 'rarible.com',
+  },
 };
 
 export const FORM_DISPLAY = {

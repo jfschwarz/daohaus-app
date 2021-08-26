@@ -25,6 +25,7 @@ import SuperfluidPaymentInput from './superfluidPaymentInput';
 import BuyoutPaymentInput from './buyoutPaymentInput';
 import RageInput from './rageInput';
 import RaribleNftSelect from './raribleNftData';
+import RaribleNftInput from './raribleNftInput';
 
 export const InputFactory = props => {
   const { type } = props;
@@ -102,6 +103,9 @@ export const InputFactory = props => {
   }
   if (type === 'minionTypeSelect') {
     return <MinionTypeSelect {...props} />;
+  }
+  if (type === 'raribleNftInput') {
+    return <RaribleNftInput {...props} />;
   }
   return null;
 };

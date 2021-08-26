@@ -413,6 +413,20 @@ export const FORM = {
       ],
     ],
   },
+  BUY_NFT_RARIBLE: {
+    id: 'BUY_NFT_RARIBLE',
+    title: 'Buy NFT from Rarible',
+    subtitle: 'Propose to buy an NFT from Rarible using DAO funds',
+    description: 'Propose to buy an NFT from Rarible using DAO funds',
+    type: PROPOSAL_TYPES.BUY_NFT,
+    minionType: MINION_TYPES.NEAPOLITAN,
+    tx: null,
+    required: ['title'],
+    fields: [
+      [FIELD.RARIBLE_NFT_INPUT],
+      [FIELD.TITLE, FIELD.DESCRIPTION, FIELD.SET_PRICE],
+    ],
+  },
   MINION_BUYOUT_ERC721_TOKEN: {
     id: 'MINION_BUYOUT_ERC721_TOKEN',
     title: 'Buyout Proposal',

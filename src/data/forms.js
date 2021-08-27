@@ -421,10 +421,10 @@ export const FORM = {
     type: PROPOSAL_TYPES.BUY_NFT,
     minionType: MINION_TYPES.NEAPOLITAN,
     tx: null,
-    required: ['title'],
+    required: ['title', 'sellPrice', 'nftListing'],
     fields: [
       [FIELD.RARIBLE_NFT_INPUT],
-      [FIELD.TITLE, FIELD.DESCRIPTION, FIELD.SET_PRICE],
+      [FIELD.TITLE, FIELD.DESCRIPTION, FIELD.PAYMENT_REQUEST],
     ],
   },
   MINION_BUYOUT_ERC721_TOKEN: {

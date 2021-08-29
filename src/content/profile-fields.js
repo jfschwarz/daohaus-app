@@ -3,7 +3,7 @@ const validCountryCode = /^[A-Z]{2}$/;
 
 export const uploadFields = [
   {
-    id: 'avatar',
+    id: 'image',
     name: 'Avatar',
     helperText: 'Testing',
     borderRadius: '50%',
@@ -11,11 +11,12 @@ export const uploadFields = [
     justify: 'center',
   },
   {
-    id: 'banner',
+    id: 'background',
     name: 'Banner',
     helperText: 'Testing',
     justify: 'flex-start',
     minW: '350px',
+    w: '70%',
     pl: '15px',
   },
 ];

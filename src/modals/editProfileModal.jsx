@@ -9,6 +9,8 @@ import {
   Icon,
   Tooltip,
   Box,
+  Link,
+  Image,
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { RiInformationLine, RiErrorWarningLine } from 'react-icons/ri';
@@ -65,6 +67,17 @@ const EditProfileModal = () => {
   }, [did, address]);
 
   const fields = profileFields(register);
+  console.log(profile);
+
+  const HelperTextComponent = ({ text }) => {
+    return (
+      <Tooltip label={text} hasArrow placement='right'>
+        <Box>
+          <Icon as={RiInformationLine} w='15px' h='15px' />
+        </Box>
+      </Tooltip>
+    );
+  };
 
   return (
     <Modal modalId='editProfile' size='xl'>
@@ -73,8 +86,16 @@ const EditProfileModal = () => {
           Basic Profile
         </TextBox>
         <Heading size='lg'>Update Basic Profile</Heading>
-        <TextBox value='body' size='xs'>
-          Editing here will update your profile everywhere IDX is used.
+        <TextBox value='body' size='xs' maxW='80%'>
+          Editing here will update your profile everywhere{' '}
+          <Link
+            href='https://self.id'
+            target='_blank'
+            rel='noreferrer noopener'
+          >
+            IDX
+          </Link>{' '}
+          is used.
         </TextBox>
       </Stack>
 
@@ -97,46 +118,62 @@ const EditProfileModal = () => {
             </TextBox>
           </Flex>
 
-          <HStack w='100%' justify='space-between'>
-            {uploadFields.map(upload => (
-              <Stack key={upload.id}>
-                <HStack>
-                  <TextBox size='xs'>{upload.name}</TextBox>
-                  {upload.helperText && (
-                    <Tooltip
-                      label={upload.helperText}
-                      hasArrow
-                      placement='right'
+          {did?.did && (
+            <HStack w='100%' justify='space-between'>
+              {profile &&
+                uploadFields.map(upload => {
+                  const url = profile[upload.id]?.original?.src.replace(
+                    'ipfs://',
+                    'https://ipfs.infura.io/ipfs/',
+                  );
+                  return (
+                    <Stack
+                      key={upload.id}
+                      w={upload.id === 'background' ? upload.w : undefined}
                     >
-                      <Box>
-                        <Icon as={RiInformationLine} w='15px' h='15px' />
-                      </Box>
-                    </Tooltip>
-                  )}
-                </HStack>
-                <Flex
-                  h='50px'
-                  w={upload.w}
-                  minW={upload.minW}
-                  justify={upload.justify}
-                  align='center'
-                  border='1px'
-                  borderStyle='dotted'
-                  borderColor='whiteAlpha.800'
-                  borderRadius={upload.borderRadius}
-                  pl={upload.pl}
-                  _hover={{ cursor: 'pointer' }}
-                >
-                  <Icon
-                    as={AiOutlinePlus}
-                    h='25px'
-                    w='25px'
-                    color='primary.100'
-                  />
-                </Flex>
-              </Stack>
-            ))}
-          </HStack>
+                      <HStack>
+                        <TextBox size='xs'>{upload.name}</TextBox>
+                        {upload.helperText && (
+                          <HelperTextComponent text={upload.helperText} />
+                        )}
+                      </HStack>
+                      {profile[upload.id] ? (
+                        <Image
+                          w={upload.id === 'image' ? upload.w : undefined}
+                          h='50px'
+                          borderRadius={upload.borderRadius}
+                          src={url}
+                          objectFit='cover'
+                          _hover={{ cursor: 'pointer' }}
+                          onClick={() => undefined}
+                        />
+                      ) : (
+                        <Flex
+                          h='50px'
+                          w={upload.w}
+                          minW={upload.minW}
+                          justify={upload.justify}
+                          align='center'
+                          border='1px'
+                          borderStyle='dotted'
+                          borderColor='whiteAlpha.800'
+                          borderRadius={upload.borderRadius}
+                          pl={upload.pl}
+                          _hover={{ cursor: 'pointer' }}
+                        >
+                          <Icon
+                            as={AiOutlinePlus}
+                            h='25px'
+                            w='25px'
+                            color='primary.100'
+                          />
+                        </Flex>
+                      )}
+                    </Stack>
+                  );
+                })}
+            </HStack>
+          )}
 
           {fields.map(field => (
             <Stack
@@ -147,11 +184,7 @@ const EditProfileModal = () => {
               <HStack>
                 <TextBox size='xs'>{field.name}</TextBox>
                 {field.helperText && (
-                  <Tooltip label={field.helperText} hasArrow placement='right'>
-                    <Box>
-                      <Icon as={RiInformationLine} w='15px' h='15px' />
-                    </Box>
-                  </Tooltip>
+                  <HelperTextComponent text={field.helperText} />
                 )}
               </HStack>
 

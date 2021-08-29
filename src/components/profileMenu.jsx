@@ -6,7 +6,6 @@ import {
   Icon,
   MenuButton,
   MenuItem,
-  Link,
   useToast,
 } from '@chakra-ui/react';
 import { BsThreeDotsVertical } from 'react-icons/bs';
@@ -27,7 +26,7 @@ const ProfileMenu = ({ member }) => {
   const { openFormModal } = useFormModal();
   const { daochain, daoid } = useParams();
   const { daoMember } = useDaoMember();
-  const { errorToast } = useOverlay();
+  const { errorToast, setGenericModal } = useOverlay();
   const { submitTransaction } = useTX();
 
   const [canRageQuit, setCanRageQuit] = useState(false);
@@ -107,7 +106,9 @@ const ProfileMenu = ({ member }) => {
         setCanRageQuit(true);
       }
     };
-    getCanRageQuit();
+    if (daoConnectedAndSameChain(address, injectedChain, daochain)) {
+      getCanRageQuit();
+    }
   }, [daoMember]);
 
   return (
@@ -126,13 +127,9 @@ const ProfileMenu = ({ member }) => {
           <MenuItem>Copy Address</MenuItem>
         </CopyToClipboard>
 
-        <Link
-          href={`https://3box.io/${member?.memberAddress}`}
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          <MenuItem>View 3box Profile</MenuItem>
-        </Link>
+        <MenuItem onClick={() => setGenericModal({ editProfile: true })}>
+          Edit Profile
+        </MenuItem>
 
         {daoConnectedAndSameChain(address, daochain, injectedChain?.chainId) ? (
           <>

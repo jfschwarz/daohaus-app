@@ -19,6 +19,7 @@ const GenericModal = ({
   children,
   modalId,
   title,
+  size,
   formLego,
   closeOnOverlayClick = true,
 }) => {
@@ -33,6 +34,7 @@ const GenericModal = ({
       closeOnEsc={false}
       closeOnOverlayClick={closeOnOverlayClick}
       onClose={closeModal}
+      size={size}
       isCentered
     >
       <ModalOverlay

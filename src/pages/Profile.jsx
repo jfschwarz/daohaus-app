@@ -7,6 +7,7 @@ import BankList from '../components/BankList';
 import ActivitiesFeed from '../components/activitiesFeed';
 import ProfileCard from '../components/profileCard';
 import MainViewLayout from '../components/mainViewLayout';
+import EditProfileModal from '../modals/editProfileModal';
 import { getProfileActivites } from '../utils/activities';
 import { handleGetProfile } from '../utils/3box';
 import { initTokenData } from '../utils/tokenValue';
@@ -78,6 +79,7 @@ const Profile = ({ members, overview, daoTokens, activities }) => {
           pr={[0, null, null, null, 6]}
           pb={6}
         >
+          <EditProfileModal />
           <ProfileCard
             overview={overview}
             daoTokens={daoTokens}

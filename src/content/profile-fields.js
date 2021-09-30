@@ -29,7 +29,12 @@ export const profileFields = register => {
       placeholder: 'Michael Scott',
       helperText: 'Testing',
       fullWidth: true,
-      // check for max length?
+      register: register('name', {
+        maxLength: {
+          value: 150,
+          message: 'Name must be less than 150 characters',
+        },
+      }),
     },
     {
       id: 'description',
@@ -38,20 +43,33 @@ export const profileFields = register => {
       helperText: 'Testing',
       fullWidth: true,
       // check for max length?
+      register: register('description', {
+        maxLength: {
+          value: 420,
+          message: 'Name must be less than 420 characters',
+        },
+      }),
     },
     {
       id: 'emoji',
       name: 'Spirit Emoji',
       placehorder: '💡',
       helperText: 'Testing',
-      // check for max length?
+      register: register('emoji', {
+        maxLength: { value: 2, message: 'Not a valid emoji' },
+      }),
     },
     {
       id: 'homeLocation',
       name: 'Location',
       placeholder: 'Malta',
       helperText: 'Testing',
-      // check for max length?
+      register: register('homeLocation', {
+        maxLength: {
+          value: 140,
+          message: 'Location must be less than 420 characters',
+        },
+      }),
     },
     {
       id: 'residenceCountry',

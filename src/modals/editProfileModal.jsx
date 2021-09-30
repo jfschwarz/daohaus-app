@@ -20,7 +20,7 @@ import TextBox from '../components/TextBox';
 import { useInjectedProvider } from '../contexts/InjectedProviderContext';
 import { useOverlay } from '../contexts/OverlayContext';
 import { profileFields, uploadFields } from '../content/profile-fields';
-import { getDid, getProfile, updateProfile } from '../utils/3box';
+import { getDid, getProfile, updateProfile, storeProfile } from '../utils/3box';
 
 const EditProfileModal = () => {
   const { address } = useInjectedProvider();
@@ -35,13 +35,17 @@ const EditProfileModal = () => {
   };
 
   const onSubmit = async values => {
+		console.log("Values")
+		console.log(values)
+		console.log("After")
     const localProfile = {
       ...profile,
       ...values,
     };
     console.log(localProfile);
-    const result = await updateProfile(did.ceramic, localProfile);
+    const result = await updateProfile(did, localProfile);
     console.log(result);
+		setProfile(localProfile)
     successToast({ title: 'Updated IDX profile.' });
     setGenericModal({});
   };
@@ -52,22 +56,30 @@ const EditProfileModal = () => {
 
   useEffect(() => {
     const fetchIdxProfile = async () => {
-      const local = await getProfile(did.ceramic);
+      let local = await getProfile(did);
+			if (!local) {
+				local = await storeProfile(did)
+			}
+			// Might make sense to link to mainnet
       setProfile(local);
+			console.log("Profile")
+			console.log(did)
+			console.log(local)
     };
     // const fetchGenericProfile = async () => {
     //   const local = await getProfile(did?.ceramic, `${address}@eip155:1`);
+		// 	console.log("Profile")
+		// 	console.log(local)
     //   setProfile(local);
     // };
-    if (did?.did) {
+    console.log('Did');
+    console.log(did);
+    if (did) {
       fetchIdxProfile();
-    } else if (address) {
-      // fetchGenericProfile();
     }
   }, [did, address]);
 
   const fields = profileFields(register);
-  console.log(profile);
 
   const HelperTextComponent = ({ text }) => {
     return (
@@ -101,22 +113,24 @@ const EditProfileModal = () => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex wrap='wrap' justify='space-between' my={4} position='relative'>
-          <Flex
-            display={profile ? 'none' : 'flex'}
-            w='106%'
-            h='105%'
-            top='-5'
-            left='-5'
-            backdropFilter='blur(6px)'
-            position='absolute'
-            zIndex={5}
-            justify='center'
-            align='center'
-          >
-            <TextBox w='40%' textAlign='center'>
-              Connect to update your profile
-            </TextBox>
-          </Flex>
+          {!did ?
+            <Flex
+              display={profile ? 'none' : 'flex'}
+              w='106%'
+              h='105%'
+              top='-5'
+              left='-5'
+              backdropFilter='blur(6px)'
+              position='absolute'
+              zIndex={5}
+              justify='center'
+              align='center'
+            >
+              <TextBox w='40%' textAlign='center'>
+                Connect to update your profile
+              </TextBox>
+            </Flex> : <></>
+          }
 
           {did?.did && (
             <HStack w='100%' justify='space-between'>
@@ -216,7 +230,7 @@ const EditProfileModal = () => {
           <Button onClick={() => setGenericModal({})} variant='outline'>
             Cancel
           </Button>
-          {did?.did ? (
+          {did ? (
             <Button type='submit'>Submit</Button>
           ) : (
             <Button onClick={authenticate}>Connect</Button>

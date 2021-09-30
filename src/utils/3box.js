@@ -29,43 +29,43 @@ export const getDid = async address => {
     const provider = await threeIdConnect.getDidProvider();
     await localCeramic.did.setProvider(provider);
     const result = await localCeramic.did.authenticate();
-    return {
-      did: result,
-      ceramic: localCeramic,
-    };
+    return localCeramic.did;
   } catch (err) {
     console.log(err);
   }
 };
 
-export const getProfile = async (localCeramic, userDid) => {
+export const getProfile = async did => {
+  const localCeramic = new Ceramic('https://ceramic-clay.3boxlabs.com');
+  localCeramic.setDID(did);
   try {
-    if (userDid) {
-      console.log(userDid);
-      try {
-        const noAuthCeramic = ceramic();
-        const idx = new IDX({ ceramic: noAuthCeramic, aliases });
-        const result = await idx.get('basicProfile', userDid);
-        return result;
-      } catch (err) {
-        console.log(err);
-      }
-    } else {
-      try {
-        const idx = new IDX({ ceramic: localCeramic, aliases });
-        const result = await idx.get('basicProfile');
-        return result;
-      } catch (err) {
-        console.log(err);
-      }
-    }
+    const idx = new IDX({ ceramic: localCeramic, aliases });
+    const result = await idx.get('basicProfile');
+    return result;
   } catch (err) {
-    console.log(err);
+    console.error('Trouble intializing IDX');
   }
 };
 
-export const updateProfile = async (localCeramic, profile) => {
+export const storeProfile = async (did, profile) => {
+  const localCeramic = new Ceramic('https://ceramic-clay.3boxlabs.com');
+  localCeramic.setDID(did);
   try {
+    const idx = new IDX({ ceramic: localCeramic, aliases });
+    // Profile has to be set
+    const result = await idx.set('basicProfile', {
+      name: 'Example',
+    });
+    return result;
+  } catch (err) {
+    console.error('Trouble intializing IDX');
+  }
+};
+
+export const updateProfile = async (did, profile) => {
+  try {
+    const localCeramic = new Ceramic('https://ceramic-clay.3boxlabs.com');
+    localCeramic.setDID(did);
     const idx = new IDX({ ceramic: localCeramic, aliases });
     const result = await idx.set('basicProfile', profile);
     console.log(result);

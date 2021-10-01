@@ -1,6 +1,8 @@
 import Ceramic from '@ceramicnetwork/http-client';
 import { IDX } from '@ceramicstudio/idx';
 import { ThreeIdConnect, EthereumAuthProvider } from '@3id/connect';
+import { EthereumAuthProvider as LinkingProvider } from '@ceramicnetwork/blockchain-utils-linking';
+import { Caip10Link } from '@ceramicnetwork/stream-caip10-link';
 import ThreeIdResolver from '@ceramicnetwork/3id-did-resolver';
 import { DID } from 'dids';
 
@@ -20,6 +22,10 @@ export const ceramic = () => {
   }
 };
 
+// Conundrum how to force profile creation
+// fetch and update on mainnet
+//
+// Does metamask need to be on mainnet?
 export const getDid = async address => {
   try {
     const localCeramic = ceramic();
@@ -35,15 +41,43 @@ export const getDid = async address => {
   }
 };
 
+const exampleCryptoAccounts = async (did, idx) => {
+  const accounts = await idx.get('cryptoAccounts');
+  console.log('Accounts');
+  console.log(accounts);
+  console.log('After Accounts');
+  if (!accounts[`${window.ethereum.selectedAddress}:1`]) {
+    await ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: '0x1' }],
+    });
+    const localCeramic = new Ceramic('https://ceramic-clay.3boxlabs.com');
+    console.log('hey');
+    const link = await Caip10Link.fromAccount(
+      localCeramic,
+      `${window.ethereum.selectedAddress}@eip155:1`,
+    );
+    console.log(link);
+    const authProvider = new LinkingProvider(
+      window.ethereum,
+      window.ethereum.selectedAddress,
+    );
+    console.log(authProvider);
+    await link.setDid(did, authProvider);
+    console.log('id set');
+  }
+};
+
 export const getProfile = async did => {
   const localCeramic = new Ceramic('https://ceramic-clay.3boxlabs.com');
   localCeramic.setDID(did);
   try {
     const idx = new IDX({ ceramic: localCeramic, aliases });
     const result = await idx.get('basicProfile');
+    await exampleCryptoAccounts(did, idx);
     return result;
   } catch (err) {
-    console.error('Trouble intializing IDX');
+    console.error(`Trouble fetching basicProfile: ${err}`);
   }
 };
 

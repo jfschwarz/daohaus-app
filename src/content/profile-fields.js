@@ -27,7 +27,7 @@ export const profileFields = register => {
       id: 'name',
       name: 'Name',
       placeholder: 'Michael Scott',
-      helperText: 'Testing',
+      helperText: 'A name for your profile',
       fullWidth: true,
       register: register('name', {
         maxLength: {
@@ -40,7 +40,7 @@ export const profileFields = register => {
       id: 'description',
       name: 'Bio',
       placeholder: 'My little DAO bio',
-      helperText: 'Testing',
+      helperText: 'A brief description about yourself',
       fullWidth: true,
       // check for max length?
       register: register('description', {
@@ -54,7 +54,7 @@ export const profileFields = register => {
       id: 'emoji',
       name: 'Spirit Emoji',
       placehorder: '💡',
-      helperText: 'Testing',
+      helperText: 'An emoji to represent who you are',
       register: register('emoji', {
         maxLength: { value: 2, message: 'Not a valid emoji' },
       }),
@@ -63,7 +63,7 @@ export const profileFields = register => {
       id: 'homeLocation',
       name: 'Location',
       placeholder: 'Malta',
-      helperText: 'Testing',
+      helperText: 'A location where you are or hope to be',
       register: register('homeLocation', {
         maxLength: {
           value: 140,
@@ -75,7 +75,7 @@ export const profileFields = register => {
       id: 'residenceCountry',
       name: '2-letter Country Code',
       placeholder: 'UK',
-      helperText: 'Testing',
+      helperText: 'The country code of where you reside',
       register: register('residenceCountry', {
         validate: {
           countryCode: v => validCountryCode.test(v) || '2 Letter Country Code',
@@ -86,7 +86,7 @@ export const profileFields = register => {
       id: 'url',
       name: 'URL',
       placeholder: 'https://daohaus.eth',
-      helperText: 'Testing',
+      helperText: 'A url to find out more about you',
       register: register('url', {
         validate: {
           isUrl: v => validUrl.test(v) || 'Please provide valid URL address',

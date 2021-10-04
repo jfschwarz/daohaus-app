@@ -1,7 +1,11 @@
 import Ceramic from '@ceramicnetwork/http-client';
 import { IDX } from '@ceramicstudio/idx';
+import { AccountId } from 'caip';
 import { ThreeIdConnect, EthereumAuthProvider } from '@3id/connect';
-import { EthereumAuthProvider as LinkingProvider } from '@ceramicnetwork/blockchain-utils-linking';
+import {
+  EthereumAuthProvider as LinkingProvider,
+  createLink,
+} from '@ceramicnetwork/blockchain-utils-linking';
 import { Caip10Link } from '@ceramicnetwork/stream-caip10-link';
 import ThreeIdResolver from '@ceramicnetwork/3id-did-resolver';
 import { DID } from 'dids';
@@ -22,19 +26,25 @@ export const ceramic = () => {
   }
 };
 
+export const getCeramic = async address => {
+  const localCeramic = ceramic();
+  const threeIdConnect = new ThreeIdConnect();
+  const authProvider = new EthereumAuthProvider(window.ethereum, address);
+  await threeIdConnect.connect(authProvider);
+  const provider = await threeIdConnect.getDidProvider();
+  await localCeramic.did.setProvider(provider);
+  const result = await localCeramic.did.authenticate();
+
+  return localCeramic;
+};
+
 // Conundrum how to force profile creation
 // fetch and update on mainnet
 //
 // Does metamask need to be on mainnet?
 export const getDid = async address => {
   try {
-    const localCeramic = ceramic();
-    const threeIdConnect = new ThreeIdConnect();
-    const authProvider = new EthereumAuthProvider(window.ethereum, address);
-    await threeIdConnect.connect(authProvider);
-    const provider = await threeIdConnect.getDidProvider();
-    await localCeramic.did.setProvider(provider);
-    const result = await localCeramic.did.authenticate();
+    const localCeramic = await getCeramic(address);
     return localCeramic.did;
   } catch (err) {
     console.log(err);
@@ -46,24 +56,24 @@ const exampleCryptoAccounts = async (did, idx) => {
   console.log('Accounts');
   console.log(accounts);
   console.log('After Accounts');
-  if (!accounts[`${window.ethereum.selectedAddress}:1`]) {
+  const caipAddress = `${window.ethereum.selectedAddress}:1`;
+  if (!accounts[caipAddress]) {
     await ethereum.request({
       method: 'wallet_switchEthereumChain',
       params: [{ chainId: '0x1' }],
     });
-    const localCeramic = new Ceramic('https://ceramic-clay.3boxlabs.com');
+    // const ceramic = await getCeramic(window.ethereum.selectedAddress);
+    // const idx = new IDX({ ceramic: ceramic, aliases });
     console.log('hey');
-    const link = await Caip10Link.fromAccount(
-      localCeramic,
-      `${window.ethereum.selectedAddress}@eip155:1`,
-    );
-    console.log(link);
     const authProvider = new LinkingProvider(
       window.ethereum,
       window.ethereum.selectedAddress,
     );
     console.log(authProvider);
-    await link.setDid(did, authProvider);
+    const linkProof = await authProvider.createLink(did);
+    console.log(linkProof);
+    console.log(linkProof?.did);
+    await idx.merge(caipAddress, `ceramic://${did}`);
     console.log('id set');
   }
 };
@@ -74,7 +84,7 @@ export const getProfile = async did => {
   try {
     const idx = new IDX({ ceramic: localCeramic, aliases });
     const result = await idx.get('basicProfile');
-    await exampleCryptoAccounts(did, idx);
+    // await exampleCryptoAccounts(did, idx);
     return result;
   } catch (err) {
     console.error(`Trouble fetching basicProfile: ${err}`);

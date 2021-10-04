@@ -11,6 +11,7 @@ import {
   Box,
   Link,
   Image,
+	useToast,
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { RiInformationLine, RiErrorWarningLine } from 'react-icons/ri';
@@ -28,23 +29,48 @@ const EditProfileModal = () => {
   const { register, handleSubmit, errors } = useForm();
   const [did, setDid] = useState();
   const [profile, setProfile] = useState();
+	const toast = useToast()
+
+	const verifyMainnet = async () => {
+		try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x1' }],
+      });
+			return true
+		} catch (err) {
+			console.error(err)
+			toast({
+		    title: "Profile can only be updated on mainnet",
+				position: 'top-right',
+				status: 'success',
+				duration: 3000,
+				isClosable: true,
+			})
+			return false
+		}
+
+	}
 
   const authenticate = async () => {
+		const verified = await verifyMainnet()
+		if (!verified) {
+			return 
+		}
     const localDid = await getDid(address);
     setDid(localDid);
   };
 
   const onSubmit = async values => {
-		console.log("Values")
-		console.log(values)
-		console.log("After")
+		const verified = await verifyMainnet()
+		if (!verified) {
+			return
+		}
     const localProfile = {
       ...profile,
       ...values,
     };
-    console.log(localProfile);
     const result = await updateProfile(did, localProfile);
-    console.log(result);
 		setProfile(localProfile)
     successToast({ title: 'Updated IDX profile.' });
     setGenericModal({});
@@ -60,20 +86,8 @@ const EditProfileModal = () => {
 			if (!local) {
 				local = await storeProfile(did)
 			}
-			// Might make sense to link to mainnet
       setProfile(local);
-			console.log("Profile")
-			console.log(did)
-			console.log(local)
     };
-    // const fetchGenericProfile = async () => {
-    //   const local = await getProfile(did?.ceramic, `${address}@eip155:1`);
-		// 	console.log("Profile")
-		// 	console.log(local)
-    //   setProfile(local);
-    // };
-    console.log('Did');
-    console.log(did);
     if (did) {
       fetchIdxProfile();
     }

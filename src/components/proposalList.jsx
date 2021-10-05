@@ -3,6 +3,7 @@ import { Flex, Spinner, Box } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
 
 import ProposalCard from './proposalCard';
+import ProposalCard2 from './proposalCard2';
 import Paginator from './paginator';
 import {
   defaultFilterOptions,
@@ -149,6 +150,10 @@ const ProposalsList = ({ proposals, customTerms }) => {
           resetSearch={resetSearch}
         />
         <CsvDownloadButton entityList={listProposals} typename='Proposals' />
+      </Flex>
+
+      <Flex w='100%' direction='column'>
+        <ProposalCard2 />
       </Flex>
       {isLoaded &&
         paginatedProposals?.map(proposal => {

@@ -413,6 +413,13 @@ export const FIELD = {
     title: 'Minion Setup',
     expectType: 'any',
   },
+  SAFE_MULTI_SEND_BATCH: {
+    type: 'safeMultiSendBatch',
+    label: 'Transactions',
+    name: 'safeMultiSendBatch',
+    htmlFor: 'safeMultiSendBatch',
+    expectType: 'any',
+  },
   TEST_SWITCH: {
     type: 'checkSwitch',
     listenTo: 'formCondition',

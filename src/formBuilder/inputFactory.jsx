@@ -28,6 +28,7 @@ import NftApproval from './nftApproval';
 import TokenInfoInput from './tokenInfoInput';
 import CheckSwitch from './checkSwitch';
 import CheckGate from './checkGate';
+import SafeMultiSendBatch from './safeMultiSendBatch';
 import SaltGenerator from './saltGenerator';
 import SuperfluidPaymentInput from './superfluidPaymentInput';
 import SuperfluidRate from './superfluidRate';
@@ -143,6 +144,9 @@ export const InputFactory = props => {
   }
   if (type === 'saltGenerator') {
     return <SaltGenerator {...props} />;
+  }
+  if (type === 'safeMultiSendBatch') {
+    return <SafeMultiSendBatch {...props} />;
   }
   return null;
 };

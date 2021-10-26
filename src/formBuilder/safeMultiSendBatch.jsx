@@ -1,15 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
-import { Button, Box, IconButton, Tag, TagLabel } from '@chakra-ui/react';
+import {
+  Button,
+  Box,
+  IconButton,
+  Tag,
+  TagLabel,
+  Icon,
+  Tooltip,
+} from '@chakra-ui/react';
 import { FaRegTrashAlt } from 'react-icons/fa';
+import { RiErrorWarningLine, RiCheckboxCircleLine } from 'react-icons/ri';
 import {
   createTransaction,
   TransactionType,
   useMultiSendContext,
   ProvideMultiSendContext,
+  isValid,
 } from 'react-multisend';
-import { Spinner } from '@chakra-ui/spinner';
 
 import { useDao } from '../contexts/DaoContext';
 import ContentBox from '../components/ContentBox';
@@ -17,6 +26,7 @@ import FieldWrapper from './fieldWrapper';
 import GenericSelect from './genericSelect';
 import SafePaymentInput from './safePaymentInput';
 import AddressInput from './addressInput';
+import SafeCollectibleSelect from './safeCollectibleSelect';
 
 const defaultTransactionType = TransactionType.transferFunds;
 
@@ -55,7 +65,13 @@ const SafeMultiSendBatch = props => {
     control: localForm.control,
   });
 
+  const { setValue } = localForm;
+
   const selectedMinion = localForm.watch('selectedMinion');
+
+  useEffect(() => {
+    setValue(name, []);
+  }, [selectedMinion]);
 
   const handleAdd = () => {
     append(createTransaction(defaultTransactionType));
@@ -83,7 +99,6 @@ const SafeMultiSendBatch = props => {
           <Transaction
             key={field.key}
             index={index}
-            value={field}
             remove={remove}
             replace={replace}
             localForm={localForm}
@@ -104,7 +119,16 @@ const SafeMultiSendBatch = props => {
 
 export default SafeMultiSendBatch;
 
-const TransactionHeader = ({ value, index, onClick, onRemove }) => {
+const TransactionHeader = ({
+  localForm,
+  namePrefix,
+  index,
+  onClick,
+  onRemove,
+}) => {
+  const { watch } = localForm;
+  const value = watch(namePrefix);
+  console.log({ value });
   let title;
   switch (value.type) {
     case TransactionType.callContract:
@@ -137,7 +161,18 @@ const TransactionHeader = ({ value, index, onClick, onRemove }) => {
         </Box>
         <TagLabel>{title}</TagLabel>
       </Tag>
-
+      {!isValid(value) && (
+        <Tooltip
+          shouldWrapChildren
+          placement='right'
+          label='There are some missing or invalid inputs'
+        >
+          <Icon as={RiErrorWarningLine} color='red.500' ml={2} mt={1} />
+        </Tooltip>
+      )}
+      {isValid(value) && (
+        <Icon as={RiCheckboxCircleLine} color='green.500' ml={2} mt={1} />
+      )}
       <IconButton
         variant='outline'
         size='sm'
@@ -161,7 +196,6 @@ const TX_TYPE_OPTIONS = [
 
 export const Transaction = ({
   index,
-  value,
   replace,
   remove,
   localForm,
@@ -173,8 +207,9 @@ export const Transaction = ({
   return (
     <ContentBox mb='2'>
       <TransactionHeader
+        localForm={localForm}
+        namePrefix={namePrefix}
         index={index}
-        value={value}
         onRemove={() => {
           remove(index);
         }}
@@ -194,7 +229,6 @@ export const Transaction = ({
           <TransactionBody
             namePrefix={namePrefix}
             localForm={localForm}
-            value={value}
             // onChange={handleChange}
           />
         </>
@@ -233,34 +267,47 @@ const TransferFunds = ({ namePrefix, localForm }) => (
   <>
     <AddressInput
       label='Recipient'
+      required
       placeholder='0x'
       name={`${namePrefix}.to`}
       localForm={localForm}
     />
     <SafePaymentInput
       label='Funds'
+      required
       placeholder='0'
-      name={`${namePrefix}.amount`}
-      selectName={`${namePrefix}.token`}
+      amountName={`${namePrefix}.amount`}
+      tokenName={`${namePrefix}.token`}
+      decimalsName={`${namePrefix}.decimals`}
       localForm={localForm}
     />
   </>
 );
 
-const TransferCollectible = ({ namePrefix, localForm }) => (
-  <>
-    <AddressInput
-      label='Recipient'
-      placeholder='0x'
-      name={`${namePrefix}.to`}
-      localForm={localForm}
-    />
-    <SafePaymentInput
-      label='Funds'
-      placeholder='0'
-      name={`${namePrefix}.amount`}
-      selectName={`${namePrefix}.token`}
-      localForm={localForm}
-    />
-  </>
-);
+const TransferCollectible = ({ namePrefix, localForm }) => {
+  const { safeAddress } = useMultiSendContext();
+  const { setValue, watch } = localForm;
+  const address = watch(`${namePrefix}.address`);
+  const tokenId = watch(`${namePrefix}.tokenId`);
+  return (
+    <>
+      <AddressInput
+        label='Recipient'
+        required
+        placeholder='0x'
+        name={`${namePrefix}.to`}
+        localForm={localForm}
+      />
+      <SafeCollectibleSelect
+        label='Collectible'
+        required
+        value={{ address, tokenId }}
+        onChange={({ address, tokenId }) => {
+          setValue(`${namePrefix}.address`, address);
+          setValue(`${namePrefix}.tokenId`, tokenId);
+          setValue(`${namePrefix}.from`, safeAddress);
+        }}
+      />
+    </>
+  );
+};

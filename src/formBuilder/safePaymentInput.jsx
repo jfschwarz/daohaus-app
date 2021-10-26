@@ -5,15 +5,17 @@ import { utils } from 'ethers';
 import InputSelect from './inputSelect';
 import ModButton from './modButton';
 
+const ETH_DECIMALS = 18;
+
 const SafePaymentInput = props => {
-  const { name, selectName, localForm } = props;
+  const { amountName, tokenName, decimalsName, localForm } = props;
   const { setValue, watch } = localForm || {};
   const [balances] = useSafeBalances();
 
-  const token = watch(selectName) || '';
+  const token = watch(tokenName) || '';
 
   const balance = balances.find(b => b.tokenAddress === (token || null));
-  const decimals = balance?.token?.decimals || '18';
+  const decimals = balance?.token?.decimals || ETH_DECIMALS;
 
   const options = useMemo(
     () =>
@@ -31,12 +33,22 @@ const SafePaymentInput = props => {
   return (
     <InputSelect
       {...props}
+      name={amountName}
+      selectName={tokenName}
+      selectChange={ev => {
+        const balance = balances.find(
+          b => b.tokenAddress === (ev.target.value || null),
+        );
+        if (balance) {
+          setValue(decimalsName, balance?.token?.decimals || ETH_DECIMALS);
+        }
+      }}
       options={options}
       btn={
         maxAmount !== null && (
           <ModButton
             text={`Max: ${maxAmount}`}
-            fn={() => setValue(name, maxAmount)}
+            fn={() => setValue(amountName, maxAmount)}
           />
         )
       }

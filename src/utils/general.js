@@ -249,10 +249,14 @@ export const daoConnectedAndSameChain = (
   return address && daochain && injectedChainID === daochain;
 };
 
-export const isEthAddress = string =>
-  typeof string === 'string' && /^0x[a-fA-F0-9]{40}$/.test(string)
-    ? string
-    : false;
+export const isEthAddress = string => {
+  try {
+    utils.getAddress(string);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
 
 export const isDelegating = member => {
   if (member?.memberAddress && member?.delegateKey) {

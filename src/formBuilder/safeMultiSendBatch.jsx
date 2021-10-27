@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { useFieldArray } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import {
@@ -16,6 +16,7 @@ import {
   createTransaction,
   TransactionType,
   useMultiSendContext,
+  useContractCall,
   ProvideMultiSendContext,
   isValid,
 } from 'react-multisend';
@@ -27,6 +28,8 @@ import GenericSelect from './genericSelect';
 import SafePaymentInput from './safePaymentInput';
 import AddressInput from './addressInput';
 import SafeCollectibleSelect from './safeCollectibleSelect';
+import GenericInput from './genericInput';
+import SimpleAbiInput from './simpleAbiInput';
 
 const defaultTransactionType = TransactionType.transferFunds;
 
@@ -54,6 +57,7 @@ const SafeMultiSendBatch = props => {
     disabled,
     containerProps,
     mb,
+    error,
   } = props;
 
   const { daochain } = useParams();
@@ -92,7 +96,16 @@ const SafeMultiSendBatch = props => {
       blockExplorerApiKey={getBlockExplorerApiKey(daochain)}
     >
       <FieldWrapper
-        {...{ label, htmlFor, name, required, disabled, containerProps, mb }}
+        {...{
+          label,
+          htmlFor,
+          name,
+          required,
+          disabled,
+          containerProps,
+          mb,
+          error,
+        }}
         helperText={!selectedMinion && 'Please select a minion'}
       >
         {fields.map((field, index) => (
@@ -205,7 +218,7 @@ export const Transaction = ({
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <ContentBox mb='2'>
+    <ContentBox mb='2' mx='-6'>
       <TransactionHeader
         localForm={localForm}
         namePrefix={namePrefix}
@@ -247,17 +260,17 @@ const TransactionBody = ({ localForm, namePrefix }) => {
       return (
         <TransferCollectible localForm={localForm} namePrefix={namePrefix} />
       );
-    // case TransactionType.callContract:
-    //   return (
-    //     <CallContract
-    //       value={value}
-    //       onChange={onChange}
-    //       network={network}
-    //       blockExplorerApiKey={blockExplorerApiKey}
-    //     />
-    //   );
+    case TransactionType.callContract:
+      return (
+        <CallContract
+          localForm={localForm}
+          namePrefix={namePrefix}
+          network={network}
+          blockExplorerApiKey={blockExplorerApiKey}
+        />
+      );
     // case TransactionType.raw:
-    //   return <RawTransaction value={value} onChange={onChange} />;
+    //   return <RawTransaction localForm={localForm} namePrefix={namePrefix} />;
     default:
       throw new Error('unexpected type');
   }
@@ -308,6 +321,70 @@ const TransferCollectible = ({ namePrefix, localForm }) => {
           setValue(`${namePrefix}.from`, safeAddress);
         }}
       />
+    </>
+  );
+};
+
+const CallContract = ({
+  namePrefix,
+  localForm,
+  network,
+  blockExplorerApiKey,
+}) => {
+  const { watch, setValue } = localForm;
+  const value = watch(namePrefix);
+  const onChange = useCallback(
+    newValue => {
+      setValue(namePrefix, newValue);
+    },
+    [namePrefix, setValue],
+  );
+
+  const { functions, payable, inputs, loading, fetchSuccess } = useContractCall(
+    {
+      value,
+      onChange,
+      network,
+      blockExplorerApiKey,
+    },
+  );
+
+  const options = useMemo(
+    () => functions.map(func => ({ value: func.signature, name: func.name })),
+    [functions],
+  );
+
+  return (
+    <>
+      <AddressInput
+        label='Contract address'
+        required
+        placeholder='0x'
+        name={`${namePrefix}.to`}
+        localForm={localForm}
+      />
+      {!loading && !fetchSuccess && (
+        <SimpleAbiInput
+          label='Contract interface ABI'
+          name={`${namePrefix}.abi`}
+          localForm={localForm}
+        />
+      )}
+      <GenericSelect
+        localForm={localForm}
+        name={`${namePrefix}.functionSignature`}
+        label='Function'
+        options={options}
+        disabled={loading || !value.abi}
+      />
+      {payable && (
+        <GenericInput
+          type='number'
+          name={`${namePrefix}.value`}
+          label='Value (wei)'
+          localForm={localForm}
+        />
+      )}
     </>
   );
 };

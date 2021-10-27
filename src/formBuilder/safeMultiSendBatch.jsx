@@ -218,7 +218,7 @@ export const Transaction = ({
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <ContentBox mb='2' mx='-6'>
+    <ContentBox mb='2' mx='-6' p='6'>
       <TransactionHeader
         localForm={localForm}
         namePrefix={namePrefix}

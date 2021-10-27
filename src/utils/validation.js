@@ -1,4 +1,5 @@
 import Web3 from 'web3';
+import { isValid as isValidTxInput } from 'react-multisend';
 
 // Error Model {
 //   message: String (required)
@@ -210,6 +211,24 @@ export const customValidations = {
         };
       }
     }
+    return false;
+  },
+  validTransactionBatch({ values }) {
+    const { safeMultiSendBatch } = values;
+    if (!safeMultiSendBatch || safeMultiSendBatch.length === 0) {
+      return {
+        name: 'safeMultiSendBatch',
+        message: 'The list of transactions must not be empty',
+      };
+    }
+
+    if (safeMultiSendBatch.some(tx => !isValidTxInput(tx))) {
+      return {
+        name: 'safeMultiSendBatch',
+        message: "There's at least one invalid transaction.",
+      };
+    }
+
     return false;
   },
 };

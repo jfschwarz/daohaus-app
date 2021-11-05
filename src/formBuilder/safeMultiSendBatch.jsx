@@ -30,6 +30,7 @@ import AddressInput from './addressInput';
 import SafeCollectibleSelect from './safeCollectibleSelect';
 import GenericInput from './genericInput';
 import SimpleAbiInput from './simpleAbiInput';
+import ParamInput from './paramInput';
 
 const defaultTransactionType = TransactionType.transferFunds;
 
@@ -385,6 +386,14 @@ const CallContract = ({
           localForm={localForm}
         />
       )}
+      {inputs.map((input, index) => (
+        <ParamInput
+          key={index}
+          {...input}
+          label={input.name}
+          localForm={localForm}
+        />
+      ))}
     </>
   );
 };

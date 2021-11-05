@@ -35,6 +35,7 @@ import SuperfluidRate from './superfluidRate';
 import TargetContract from './targetContract';
 import ToggleForm from './toggleForm';
 import TributeInput from './tributeInput';
+import ParamInput from './paramInput';
 
 export const InputFactory = props => {
   const { type, formCondition } = props;
@@ -144,6 +145,9 @@ export const InputFactory = props => {
   }
   if (type === 'saltGenerator') {
     return <SaltGenerator {...props} />;
+  }
+  if (type === 'paramInput') {
+    return <ParamInput {...props} />;
   }
   if (type === 'safeMultiSendBatch') {
     return <SafeMultiSendBatch {...props} />;

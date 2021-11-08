@@ -1,4 +1,5 @@
 import Web3 from 'web3';
+import { encodeSingle, encodeMulti } from 'react-multisend';
 
 import { detailsToJSON, filterObject, HASH } from './general';
 import { valToDecimalString } from './tokenValue';
@@ -144,6 +145,21 @@ const argBuilderCallback = Object.freeze({
       values.paymentRequested || '0',
       details,
       true, // _memberOnlyEnabled
+    ];
+  },
+  proposeActionSafeMultiSend({ values, formData }) {
+    const details = detailsToJSON({
+      ...values,
+      minionType: formData.minionType,
+    });
+
+    const { data } = encodeMulti(values.safeMultiSendBatch.map(encodeSingle));
+    return [
+      data, // _transactions
+      values.paymentToken, // _withdrawToken
+      values.paymentRequested || '0', // _withdrawAmount
+      details, // _details
+      true, // memberOnlyEnabled
     ];
   },
 });

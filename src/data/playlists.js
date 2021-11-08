@@ -15,7 +15,11 @@ export const BOOST_PLAYLISTS = {
   SAFE_DEV_SUITE: {
     name: 'Safe Minion Classics',
     id: 'safeMinionClassics',
-    forms: ['MINION_SAFE_SIMPLE', 'MINION_BUYOUT_TOKEN'],
+    forms: [
+      'MINION_SAFE_SIMPLE',
+      'MINION_SAFE_MULTI_SEND',
+      'MINION_BUYOUT_TOKEN',
+    ],
   },
   RARIBLE: {
     name: 'Rarible',

@@ -389,6 +389,17 @@ export const TX = {
     argsFromCallback: 'proposeActionSafe',
     createDiscourse: true,
   },
+  MINION_PROPOSE_ACTION_SAFE_MULTI_SEND: {
+    contract: CONTRACTS.SELECTED_MINION_SAFE,
+    name: 'proposeAction',
+    poll: 'subgraph',
+    onTxHash: ACTIONS.PROPOSAL,
+    display: 'Propose Minion Action',
+    errMsg: 'Error submitting action to minion',
+    successMsg: 'Minion Proposal Created!',
+    argsFromCallback: 'proposeActionSafeMultiSend',
+    createDiscourse: true,
+  },
   CANCEL_PROPOSAL: {
     contract: CONTRACTS.CURRENT_MOLOCH,
     name: 'cancelProposal',

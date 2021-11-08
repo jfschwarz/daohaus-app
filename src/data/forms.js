@@ -274,13 +274,40 @@ export const FORM = {
     title: 'Minion Proposal',
     description: 'Extend DAO proposals to external contracts',
     type: PROPOSAL_TYPES.MINION_DEFAULT,
-    required: ['safeMultiSendBatch', 'title', 'selectedMinion'], // Use name key from proposal type object
+    required: ['targetContract', 'title', 'selectedMinion'], // Use name key from proposal type object
     minionType: MINION_TYPES.SAFE,
     tx: TX.MINION_PROPOSE_ACTION_SAFE,
     fields: [
-      [FIELD.TITLE, FIELD.MINION_SELECT, FIELD.MINION_VALUE, FIELD.DESCRIPTION],
+      [
+        FIELD.TITLE,
+        FIELD.MINION_SELECT,
+        FIELD.TARGET_CONTRACT,
+        FIELD.MINION_VALUE,
+        { ...FIELD.PAYMENT_REQUEST, label: 'Forward Funds' },
+        FIELD.DESCRIPTION,
+      ],
+      [FIELD.ABI_INPUT],
+    ],
+  },
+  MINION_SAFE_MULTI_SEND: {
+    dev: true,
+    id: 'MINION_SAFE_MULTI_SEND',
+    title: 'Minion Multi-Send Proposal',
+    description: 'Make a proposal for a multi-send transaction from the minion',
+    type: PROPOSAL_TYPES.MINION_DEFAULT,
+    required: ['title', 'selectedMinion', 'safeMultiSendBatch'], // Use name key from proposal type object
+    minionType: MINION_TYPES.SAFE,
+    tx: TX.MINION_PROPOSE_ACTION_SAFE_MULTI_SEND,
+    fields: [
+      [
+        FIELD.TITLE,
+        FIELD.MINION_SELECT,
+        { ...FIELD.PAYMENT_REQUEST, label: 'Forward Funds' },
+        FIELD.DESCRIPTION,
+      ],
       [FIELD.SAFE_MULTI_SEND_BATCH],
     ],
+    customValidations: ['validTransactionBatch'],
   },
   LOOT_GRAB: {
     id: 'LOOT_GRAB',

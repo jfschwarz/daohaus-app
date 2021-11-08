@@ -19,8 +19,10 @@ import {
   useContractCall,
   ProvideMultiSendContext,
   isValid,
+  encodeSingle,
 } from 'react-multisend';
 
+import { getAddress } from '@ethersproject/address';
 import { useDao } from '../contexts/DaoContext';
 import ContentBox from '../components/ContentBox';
 import FieldWrapper from './fieldWrapper';
@@ -33,6 +35,26 @@ import SimpleAbiInput from './simpleAbiInput';
 import ParamInput from './paramInput';
 
 const defaultTransactionType = TransactionType.transferFunds;
+
+const getEncodingErrorMessage = value => {
+  if (value.to) {
+    try {
+      getAddress(value.to);
+    } catch (err) {
+      return `${value.to} is not a valid address`;
+    }
+
+    try {
+      encodeSingle(value);
+    } catch (err) {
+      if (value.type === 'callContract') {
+        return err.message;
+      }
+    }
+  }
+
+  return 'Fill all required fields';
+};
 
 const getBlockExplorerApiKey = chainId => {
   switch (chainId) {
@@ -142,7 +164,7 @@ const TransactionHeader = ({
 }) => {
   const { watch } = localForm;
   const value = watch(namePrefix);
-  console.log({ value });
+
   let title;
   switch (value.type) {
     case TransactionType.callContract:
@@ -179,7 +201,7 @@ const TransactionHeader = ({
         <Tooltip
           shouldWrapChildren
           placement='right'
-          label='There are some missing or invalid inputs'
+          label={getEncodingErrorMessage(value)}
         >
           <Icon as={RiErrorWarningLine} color='red.500' ml={2} mt={1} />
         </Tooltip>
@@ -289,7 +311,7 @@ const TransferFunds = ({ namePrefix, localForm }) => (
     <SafePaymentInput
       label='Funds'
       required
-      placeholder='0'
+      placeholder='0.0'
       amountName={`${namePrefix}.amount`}
       tokenName={`${namePrefix}.token`}
       decimalsName={`${namePrefix}.decimals`}
@@ -386,10 +408,11 @@ const CallContract = ({
           localForm={localForm}
         />
       )}
-      {inputs.map((input, index) => (
+      {inputs.map(input => (
         <ParamInput
-          key={index}
+          key={input.name}
           {...input}
+          name={`${namePrefix}.inputValues.${input.name}`}
           label={input.name}
           localForm={localForm}
         />

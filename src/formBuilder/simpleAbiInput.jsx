@@ -5,7 +5,7 @@ import { Interface } from '@ethersproject/abi';
 import FieldWrapper from './fieldWrapper';
 
 const formatAbi = value => {
-  if (!value) return null;
+  if (!value) return '';
   const abiInterface = new Interface(value);
   const formatted = abiInterface.format('full');
   if (typeof formatted === 'string') return formatted;

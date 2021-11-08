@@ -31,6 +31,7 @@ import SafePaymentInput from './safePaymentInput';
 import AddressInput from './addressInput';
 import SafeCollectibleSelect from './safeCollectibleSelect';
 import GenericInput from './genericInput';
+import GenericTextarea from './genericTextArea';
 import SimpleAbiInput from './simpleAbiInput';
 import ParamInput from './paramInput';
 
@@ -292,8 +293,8 @@ const TransactionBody = ({ localForm, namePrefix }) => {
           blockExplorerApiKey={blockExplorerApiKey}
         />
       );
-    // case TransactionType.raw:
-    //   return <RawTransaction localForm={localForm} namePrefix={namePrefix} />;
+    case TransactionType.raw:
+      return <RawTransaction localForm={localForm} namePrefix={namePrefix} />;
     default:
       throw new Error('unexpected type');
   }
@@ -420,3 +421,28 @@ const CallContract = ({
     </>
   );
 };
+
+const RawTransaction = ({ namePrefix, localForm }) => (
+  <>
+    <AddressInput
+      label='Contract address'
+      required
+      placeholder='0x'
+      name={`${namePrefix}.to`}
+      localForm={localForm}
+    />
+    <GenericInput
+      type='number'
+      name={`${namePrefix}.value`}
+      label='Value (wei)'
+      localForm={localForm}
+    />
+    <GenericTextarea
+      name={`${namePrefix}.data`}
+      label='Data'
+      placeholder='0x'
+      h={40}
+      localForm={localForm}
+    />
+  </>
+);
